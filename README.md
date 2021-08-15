@@ -1,4 +1,4 @@
-  # Wapp-Chat-Data-Parsing-From-.txt-Files
+  # Wapp-Chat-Data-Parsing-From-Text-Files
   This program is designed and implemented for parsing data and grouping information based on "message export" files of Whatsapp in .txt format.
 Most of the code in the version V1.0 is focused on basic reading from a file, storing data in data structures and in general,
 pracitising basic Python programming skills and applying "Thinking Pythonically" as quoted by Prof. Charles Severance in his "Python for Everybody" book.
