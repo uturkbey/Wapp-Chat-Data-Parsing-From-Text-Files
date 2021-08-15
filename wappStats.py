@@ -1,12 +1,16 @@
 # Aouthor: Utku Türkbey
-# Whatsapp Statistics V1.0
+# Whatsapp Statistics V1.2
 # This program is designed and implemented for parsing data and grouping information based on "message export" files of Whatsapp in .txt format.
-# Most of the code in the version V1.0 is focused on basic reading from a file, storing data in data structures and in general,
+# Most of the code in the version is focused on basic reading from a file, storing data in data structures and in general,
 # pracitising basic Python programming skills and applying "Thinking Pythonically" as quoted by Prof. Charles Severance in his "Python for Everybody" book.
 # In the following versions of the code, main concern will be centered of applying statistical operations on and visualizing the parsed data.
 # For the time being most of this functionality is left out to be handled by Microsoft Excel Spreadsheets.
 # Thank you for your interest and I hope this piece of simple coding project earns your, even partial, aprreciation.
 
+#New in V1.2:
+#Rather than manual initialization of month dictionaries in section 2.1, they are created in a loop and kept in a list
+#In accordance with the updates in 2.1, section 2.5 is updated.
+#Common printing operations defined before 3.1 as a python function for simplicity. Section 3 updated accordingly.
 
 # !!!Program functionality is sensitive to data file format!!!
 # !!!Restrcitions about file format:
@@ -19,6 +23,8 @@
     # 1)opening file,
     # 2)reading file and modifying necessary data structures wrt data,
     # 3)Printing results in a ordered and easy to read format
+
+import string
 
 #1) Opening file containing wapp text results
 
@@ -36,19 +42,13 @@ while True:
 #2.1)Creation of necessary data structures to hold info
 #to keep record of number of messages sent by specific users
 counts = dict()
+#to keep record of count of used words
+wordCounts = dict()
 #to keep rocord of monthly message numbers
-jan = dict()
-feb = dict()
-march = dict()
-apr = dict()
-may = dict()
-june = dict()
-july = dict()
-aug = dict()
-sept = dict()
-oct = dict()
-nov = dict()
-dec = dict()
+months = list()
+for i in range(12):
+    months.append(dict()) #Dictionary for each month data is stored in a list, in the order where index 0 is January and index 11 is December.
+
  #to keep records of number of messages sent by specific users within those time intervals
 morning = dict() #5:00 - 19:00
 evening = dict() #19:00 - 24:00
@@ -75,84 +75,77 @@ for line in fhand : #Pase data line by line
             #2.5)message count wrt months
             dateStamp = words[0].split(".") #First word in every message line is always the date data subsction of the time stamp in the format such as [6.12.2019
             if int(dateStamp[1]) == 1 : #Month section of the date stamp shows in which month the message is sent
-                jan[words[2]] = jan.get(words[2], 0) + 1
+                months[0][words[2]] = months[0].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 2 :
-                feb[words[2]] = feb.get(words[2], 0) + 1
+                months[1][words[2]] = months[1].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 3 :
-                march[words[2]] = march.get(words[2], 0) + 1
+                months[2][words[2]] = months[2].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 4 :
-                apr[words[2]] = apr.get(words[2], 0) + 1
+                months[3][words[2]] = months[3].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 5 :
-                may[words[2]] = may.get(words[2], 0) + 1
+                months[4][words[2]] = months[4].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 6 :
-                june[words[2]] = june.get(words[2], 0) + 1
+                months[5][words[2]] = months[5].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 7 :
-                july[words[2]] = july.get(words[2], 0) + 1
+                months[6][words[2]] = months[6].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 8 :
-                aug[words[2]] = aug.get(words[2], 0) + 1
+                months[7][words[2]] = months[7].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 9 :
-                sept[words[2]] = sept.get(words[2], 0) + 1
+                months[8][words[2]] = months[8].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 10 :
-                oct[words[2]] = oct.get(words[2], 0) + 1
+                months[9][words[2]] = months[9].get(words[2], 0) + 1
             elif int(dateStamp[1]) == 11 :
-                nov[words[2]] = nov.get(words[2], 0) + 1
+                months[10][words[2]] = months[10].get(words[2], 0) + 1
             else :
-                dec[words[2]] = dec.get(words[2], 0) + 1
+                months[11][words[2]] = months[11].get(words[2], 0) + 1
             #2.6)Message body length calculation(by number of words)
             wordCount = len( ( line[msgStart+2:] ).split() ) #after ":" there is always a " ", thus +2 occures
             lengths[words[2]] = lengths.get(words[2], 0) + wordCount
+            #2.7)Number of times words are used
+            body = line[msgStart+2:] #hold body seperatel
+            body = body.translate(str.maketrans('', '', string.punctuation))
+            body = body.lower()
+            bodyWords = body.split()
+            for w in bodyWords :
+                wordCounts[w] = wordCounts.get(w, 0) + 1
 
 #3)Printing the calculated values
 #!!!(Once Again) Most of the data visualization and statsitical values calculations such as averages or standart deviations are handled in Microsoft Excel Spreadsheets.
 #!!!Follownig versions of this program will be mostly focused on visualization and analysis of the data
 
+
+def printData(data, size=0): #A function defined for handling common printing operations
+    #create a list and fill with tupples
+    lst = list()
+    for key, val in list(data.items()):
+        lst.append((val, key))
+    #sort list of tuppless and print it
+    lst.sort(reverse=True)
+    if size == 0:
+        for key, val in lst:
+            print(val, key)
+    elif size > 0:
+        for key, val in lst[:int(size)]:
+            print(val, key)
+    else:
+        print("INVALID SIZE")
+    print()
+
 #3.1)Printing total message counts
 print("Total messages: ")
-#create a list and fill with tupples
-c = list()
-for key, val in list(counts.items()):
-    c.append((val, key))
-#sort list of tuppless and print it
-c.sort(reverse=True)
-for key, val in c:
-    print(val, key)
-print()
+printData(counts)
 
 #3.2)Printing total morning message counts
 print("Total messages (5:00 - 19:00): ")
-#create a list and fill with tupples
-m = list()
-for key, val in list(morning.items()):
-    m.append((val, key))
-#sort list of tuppless and print it
-m.sort(reverse=True)
-for key, val in m:
-    print(val, key)
-print()
+printData(morning)
 
 #3.3)Printing total evening message counts
 print("Total messages (19:00 - 24:00): ")
-#create a list and fill with tupples
-e = list()
-for key, val in list(evening.items()):
-    e.append((val, key))
-#sort list of tuppless and print it
-e.sort(reverse=True)
-for key, val in e:
-    print(val, key)
-print()
+printData(evening)
 
 #3.4)Printing total night message counts
 print("Total messages (24:00 - 5:00): ")
-#create a list and fill with tupples
-n = list()
-for key, val in list(night.items()):
-    n.append((val, key))
-#sort list of tuppless and print it
-n.sort(reverse=True)
-for key, val in n:
-    print(val, key)
-print()
+printData(night)
 
 #3.5)Printing total message lengths
 print("Total/Average message lengths(by word count): ")
@@ -166,18 +159,14 @@ for key, val in l:
     print(val, key, key/counts[val])
 print()
 
+#3.6)Printing 100 most common words
+print("Number of occurance of words: ")
+print("Total word count: " , len(wordCounts))
+printData(wordCounts, 100)
 
-print(jan)
-print(feb)
-print(march)
-print(apr)
-print(may)
-print(june)
-print(july)
-print(aug)
-print(sept)
-print(oct)
-print(nov)
-print(dec)
+#3.7)Printing monthly message count of users
+for i in range(len(months)) :
+    print("Month :", i + 1)
+    printData(months[i])
 
 #This is the end:)
